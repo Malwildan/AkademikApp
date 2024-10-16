@@ -27,10 +27,7 @@ class TentangAplikasi extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Dashboard()),
-          ),
+          onPressed: () => Navigator.pop(context),
           icon: Icon(Icons.arrow_back, color: Color(0xffffffff), size: 24),
         ),
       ),
