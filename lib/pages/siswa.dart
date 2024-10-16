@@ -149,6 +149,10 @@ class _SiswaPageState extends State<SiswaPage> {
                             ? Icons.female
                             : Icons.male;
 
+                        final iconColor = gender.toLowerCase() == 'female'
+                            ? Color.fromARGB(255, 0, 200, 255)
+                            : Color.fromRGBO(255, 0, 187, 1);
+
                         return Card(
                           margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
                           color: Color(0xff3b57e7),
@@ -168,7 +172,7 @@ class _SiswaPageState extends State<SiswaPage> {
                               children: [
                                 Icon(
                                   icon,
-                                  color: Color(0xffffffff),
+                                  color: iconColor,
                                   size: 24,
                                 ),
                                 Expanded(
@@ -270,7 +274,8 @@ class _SiswaPageState extends State<SiswaPage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                      SendMessagePage(nomor: siswa['Nortu'])));
+                                                  SendMessagePage(
+                                                      nomor: siswa['Nortu'])));
                                     }
                                   },
                                   itemBuilder: (context) => [
@@ -309,10 +314,9 @@ class _SiswaPageState extends State<SiswaPage> {
                                             SizedBox(width: 5),
                                             Text('Kirim Pesan')
                                           ],
-                                        )),    
+                                        )),
                                   ],
                                 ),
-
                               ],
                             ),
                           ),
