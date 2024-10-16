@@ -46,15 +46,13 @@ class TahunData {
 }
 
 class _DashboardState extends State<Dashboard> {
+
   Future<String> getUserEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_email') ?? 'No Email Found';
   }
 
   Future<List<JenkelData>> fetchJenkel() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('tokenJwt') ?? '';
-
     try {
       final response = await supabase.from('siswa').select('JenisKelamin');
 
@@ -65,8 +63,6 @@ class _DashboardState extends State<Dashboard> {
       int femaleCount = response
           .where((data) => data['JenisKelamin'].toLowerCase() == 'female')
           .length;
-
-      int totalCount = maleCount + femaleCount;
 
       return [
         JenkelData(gender: 'Male', count: maleCount),
@@ -88,6 +84,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<List<KotaData>> fetchKota() async {
+    
     try {
       // Fetch all kota data
       final kotaResponse = await supabase.from('kota').select('id, Nama');
@@ -143,7 +140,6 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<List<TahunData>> fetchTahun() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
 
     try {
       final response = await supabase.from('siswa').select('TanggalLahir');
@@ -188,7 +184,7 @@ class _DashboardState extends State<Dashboard> {
       throw e;
     }
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -222,7 +218,7 @@ class _DashboardState extends State<Dashboard> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+            padding: EdgeInsets.all(5),
             child: GestureDetector(
                 onTap: () async {
                   String email = await getUserEmail(); // Fetch user email
@@ -244,8 +240,12 @@ class _DashboardState extends State<Dashboard> {
                     },
                   );
                 },
-                child: Icon(Icons.account_circle,
-                    color: Color(0xffffffff), size: 24)),
+                child: Padding(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Icon(Icons.account_circle,
+                      color: Color(0xffffffff), size: 24),
+                )
+            ),
           ),
         ],
       ),
@@ -312,28 +312,33 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            GridView(
+              padding: EdgeInsets.all(16),
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              physics: ScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1,
+              ),
               children: [
                 Container(
                   margin: EdgeInsets.all(0),
                   padding: EdgeInsets.all(0),
-                  width: 100,
+                  width: 200,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xff3b57e6),
+                    color: Color(0xff3a56e7),
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(12.0),
-                    border: Border.all(color: Color(0xff3e5ae9), width: 1),
+                    borderRadius: BorderRadius.circular(16.0),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -341,44 +346,44 @@ class _DashboardState extends State<Dashboard> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       FutureBuilder<List<JenkelData>>(
-                        future: fetchJenkel(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // Show loading indicator
-                          } else if (snapshot.hasError) {
-                            return Text('Error'); // Handle error state
-                          } else if (snapshot.hasData) {
-                            List<JenkelData> jenkel = snapshot.data!;
-                            int femaleCount = jenkel
-                                .firstWhere((data) => data.gender == 'Female')
-                                .count;
-                            int maleCount = jenkel
-                                .firstWhere((data) => data.gender == 'Male')
-                                .count;
-                            int totalCount = femaleCount + maleCount;
-                            return Text(
-                              totalCount.toString(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 20,
-                                color: Color(0xffffffff),
-                              ),
-                            );
-                          } else {
-                            return Text('N/A'); // Handle empty data
-                          }
-                        },
-                      ),
+                          future: fetchJenkel(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator(); // Show loading indicator
+                            } else if (snapshot.hasError) {
+                              return Text('Error'); // Handle error state
+                            } else if (snapshot.hasData) {
+                              List<JenkelData> jenkel = snapshot.data!;
+                              int femaleCount = jenkel
+                                  .firstWhere((data) => data.gender == 'Female')
+                                  .count;
+                              int maleCount = jenkel
+                                  .firstWhere((data) => data.gender == 'Male')
+                                  .count;
+                              int totalCount = femaleCount + maleCount;
+                              return Text(
+                                totalCount.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 20,
+                                  color: Color(0xffffffff),
+                                ),
+                              );
+                            } else {
+                              return Text('N/A'); // Handle empty data
+                            }
+                          },
+                        ),
                       Text(
                         "Total Siswa",
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
-                          fontSize: 12,
+                          fontSize: 11,
                           color: Color(0xffffffff),
                         ),
                       ),
@@ -388,12 +393,12 @@ class _DashboardState extends State<Dashboard> {
                 Container(
                   margin: EdgeInsets.all(0),
                   padding: EdgeInsets.all(0),
-                  width: 100,
+                  width: 200,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xff3b58e8),
+                    color: Color(0xff3e5aea),
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                   ),
                   child: Column(
@@ -402,44 +407,44 @@ class _DashboardState extends State<Dashboard> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       FutureBuilder<List<JenkelData>>(
-                        future: fetchJenkel(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // Show loading indicator
-                          } else if (snapshot.hasError) {
-                            return Text('Error'); // Handle error state
-                          } else if (snapshot.hasData) {
-                            List<JenkelData> jenkel = snapshot.data!;
-                            int femaleCount = jenkel
-                                .firstWhere((data) => data.gender == 'Female')
-                                .count;
-                            int maleCount = jenkel
-                                .firstWhere((data) => data.gender == 'Male')
-                                .count;
-                            int totalCount = femaleCount + maleCount;
-                            return Text(
-                              maleCount.toString(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 20,
-                                color: Color(0xffffffff),
-                              ),
-                            );
-                          } else {
-                            return Text('N/A'); // Handle empty data
-                          }
-                        },
-                      ),
+                          future: fetchJenkel(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator(); // Show loading indicator
+                            } else if (snapshot.hasError) {
+                              return Text('Error'); // Handle error state
+                            } else if (snapshot.hasData) {
+                              List<JenkelData> jenkel = snapshot.data!;
+                              int femaleCount = jenkel
+                                  .firstWhere((data) => data.gender == 'Female')
+                                  .count;
+                              int maleCount = jenkel
+                                  .firstWhere((data) => data.gender == 'Male')
+                                  .count;
+                              int Count = femaleCount + maleCount;
+                              return Text(
+                                maleCount.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 20,
+                                  color: Color(0xffffffff),
+                                ),
+                              );
+                            } else {
+                              return Text('N/A'); // Handle empty data
+                            }
+                          },
+                        ),
                       Text(
                         "Laki-Laki",
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
-                          fontSize: 12,
+                          fontSize: 11,
                           color: Color(0xffffffff),
                         ),
                       ),
@@ -449,12 +454,12 @@ class _DashboardState extends State<Dashboard> {
                 Container(
                   margin: EdgeInsets.all(0),
                   padding: EdgeInsets.all(0),
-                  width: 100,
+                  width: 200,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xff3e5aec),
+                    color: Color(0xff3c58e8),
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                   ),
                   child: Column(
@@ -463,44 +468,44 @@ class _DashboardState extends State<Dashboard> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       FutureBuilder<List<JenkelData>>(
-                        future: fetchJenkel(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // Show loading indicator
-                          } else if (snapshot.hasError) {
-                            return Text('Error'); // Handle error state
-                          } else if (snapshot.hasData) {
-                            List<JenkelData> jenkel = snapshot.data!;
-                            int femaleCount = jenkel
-                                .firstWhere((data) => data.gender == 'Female')
-                                .count;
-                            int maleCount = jenkel
-                                .firstWhere((data) => data.gender == 'Male')
-                                .count;
-                            int totalCount = femaleCount + maleCount;
-                            return Text(
-                              femaleCount.toString(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontStyle: FontStyle.normal,
-                                fontSize: 20,
-                                color: Color(0xffffffff),
-                              ),
-                            );
-                          } else {
-                            return Text('N/A'); // Handle empty data
-                          }
-                        },
-                      ),
+                          future: fetchJenkel(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator(); // Show loading indicator
+                            } else if (snapshot.hasError) {
+                              return Text('Error'); // Handle error state
+                            } else if (snapshot.hasData) {
+                              List<JenkelData> jenkel = snapshot.data!;
+                              int femaleCount = jenkel
+                                  .firstWhere((data) => data.gender == 'Female')
+                                  .count;
+                              int maleCount = jenkel
+                                  .firstWhere((data) => data.gender == 'Male')
+                                  .count;
+                              int totalCount = femaleCount + maleCount;
+                              return Text(
+                                femaleCount.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 20,
+                                  color: Color(0xffffffff),
+                                ),
+                              );
+                            } else {
+                              return Text('N/A'); // Handle empty data
+                            }
+                          },
+                        ),
                       Text(
                         "Perempuan",
                         textAlign: TextAlign.start,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w400,
                           fontStyle: FontStyle.normal,
-                          fontSize: 12,
+                          fontSize: 11,
                           color: Color(0xffffffff),
                         ),
                       ),
@@ -509,264 +514,289 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ],
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
+            GridView(
+              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              physics: ScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1,
+              ),
               children: [
                 Container(
                   margin: EdgeInsets.all(0),
                   padding: EdgeInsets.all(0),
-                  width: 150,
-                  height: 150,
+                  width: 200,
+                  height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xff3d59e9),
+                    color: Color(0xff3d59ea),
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        child: Text(
-                          "Jenis Kelamin",
-                          textAlign: TextAlign.start,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.normal,
-                            fontSize: 14,
-                            color: Color(0xffffffff),
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            "Jenis Kelamin",
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.clip,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14,
+                              color: Color(0xffffffff),
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: FutureBuilder<List<JenkelData>>(
-                          future: fetchJenkel(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text('Error: ${snapshot.error}'),
-                              );
-                            } else {
-                              List<JenkelData> jenkel = snapshot.data!;
-                              return SfCircularChart(
-                                palette: <Color>[
-                                  Colors.lightBlue,
-                                  Colors.pink,
-                                ],
-                                tooltipBehavior: null,
-                                series: <CircularSeries>[
-                                  DoughnutSeries<JenkelData, String>(
-                                    dataSource: jenkel,
-                                    xValueMapper: (JenkelData data, _) =>
-                                        data.gender,
-                                    yValueMapper: (JenkelData data, _) =>
-                                        data.count,
-                                    dataLabelSettings:
-                                        DataLabelSettings(isVisible: true),
-                                    enableTooltip: true,
-                                    sortingOrder: SortingOrder.descending,
-                                  )
-                                ],
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                        Expanded(
+                          child: FutureBuilder<List<JenkelData>>(
+                            future: fetchJenkel(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text('Error: ${snapshot.error}'),
+                                );
+                              } else {
+                                List<JenkelData> jenkel = snapshot.data!;
+                                return SfCircularChart(
+                                  palette: <Color>[
+                                    Colors.lightBlue,
+                                    Colors.pink,
+                                  ],
+                                  tooltipBehavior: null,
+                                  series: <CircularSeries>[
+                                    DoughnutSeries<JenkelData, String>(
+                                      dataSource: jenkel,
+                                      xValueMapper: (JenkelData data, _) =>
+                                          data.gender,
+                                      yValueMapper: (JenkelData data, _) =>
+                                          data.count,
+                                      dataLabelSettings:
+                                          DataLabelSettings(isVisible: true),
+                                      enableTooltip: true,
+                                      sortingOrder: SortingOrder.descending,
+                                    )
+                                  ],
+                                );
+                              }
+                            },
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.all(0),
                   padding: EdgeInsets.all(0),
-                  width: 150,
-                  height: 150,
+                  width: 200,
+                  height: 100,
                   decoration: BoxDecoration(
-                    color: Color(0xff3c58e9),
+                    color: Color(0xff3855e6),
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(color: Color(0x4d9e9e9e), width: 1),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        child: Text(
-                          "Kota Siswa",
-                          textAlign: TextAlign.start,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.normal,
-                            fontSize: 14,
-                            color: Color(0xffffffff),
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            "Kota Siswa",
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.clip,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14,
+                              color: Color(0xffffffff),
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: FutureBuilder(
-                          future: fetchKota(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text('Error: ${snapshot.error}'),
-                              );
-                            } else {
-                              List<KotaData> kota = snapshot.data!;
-                              return SfCircularChart(
-                                palette: <Color>[
-                                  Colors.amber,
-                                  Colors.orange,
-                                  Colors.cyan,
-                                  Colors.redAccent,
-                                  Colors.lightBlue,
-                                  Colors.limeAccent,
-                                ],
-
-                                tooltipBehavior: null,
-                                // legend: Legend(
-                                //   isVisible: true,
-                                //   overflowMode: LegendItemOverflowMode.wrap,
-                                // ),
-                                series: <CircularSeries>[
-                                  PieSeries<KotaData, String>(
-                                    dataSource: kota,
-                                    xValueMapper: (KotaData data, _) =>
-                                        data.nama,
-                                    yValueMapper: (KotaData data, _) =>
-                                        data.total,
-                                    //dataLabelMapper: (KotaData data, _) => '${data.nama}: ${data.total}',
-                                    dataLabelSettings: DataLabelSettings(
-                                      isVisible: true,
-                                    ),
-                                    enableTooltip: true,
-                                  )
-                                ],
-                              );
-                            }
-                          },
+                        Expanded(
+                          child: FutureBuilder(
+                            future: fetchKota(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text('Error: ${snapshot.error}'),
+                                );
+                              } else {
+                                List<KotaData> kota = snapshot.data!;
+                                return SfCircularChart(
+                                  palette: <Color>[
+                                    Colors.amber,
+                                    Colors.orange,
+                                    Colors.cyan,
+                                    Colors.redAccent,
+                                    Colors.lightBlue,
+                                    Colors.limeAccent,
+                                  ],
+        
+                                  tooltipBehavior: null,
+                                  series: <CircularSeries>[
+                                    PieSeries<KotaData, String>(
+                                      dataSource: kota,
+                                      xValueMapper: (KotaData data, _) =>
+                                          data.nama,
+                                      yValueMapper: (KotaData data, _) =>
+                                          data.total,
+                                      //dataLabelMapper: (KotaData data, _) => '${data.nama}: ${data.total}',
+                                      dataLabelSettings: DataLabelSettings(
+                                        isVisible: true,
+                                      ),
+                                      enableTooltip: true,
+                                    )
+                                  ],
+                                );
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-          Container(
-            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            padding: EdgeInsets.all(0),
-            width: 300,
-            height: 180,
-            decoration: BoxDecoration(
-              color: Color(0xff3c59eb),
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(12.0),
-              border: Border.all(color: Color(0x4d9e9e9e), width: 1),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                  child: Text(
-                    "Tahun Kelahiran",
-                    textAlign: TextAlign.start,
-                    overflow: TextOverflow.clip,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.normal,
-                      fontSize: 14,
-                      color: Color(0xffffffff),
-                    ),
-                  ),
+            
+            GridView(
+                padding: EdgeInsets.all(16),
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                physics: ScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 1.5,
                 ),
-                Expanded(
-                  child: Container(
-                    height: 200,
-                    width: double.infinity,
-                    child: FutureBuilder(
-                      future: fetchTahun(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
-                        } else {
-                          List<TahunData> tahun = snapshot.data!;
-                          return SfCartesianChart(
-                            primaryXAxis: CategoryAxis(
-                              labelStyle: TextStyle(
-                                color: Colors.white,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(0),
+                    padding: EdgeInsets.all(0),
+                    width: 200,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Color(0xff3b57e7),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(color: Color(0x4d9e9e9e), width: 1),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(5),
+                            child: Text(
+                              "Tahun Kelahiran",
+                              textAlign: TextAlign.start,
+                              overflow: TextOverflow.clip,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                color: Color(0xffffffff),
                               ),
                             ),
-                            primaryYAxis: NumericAxis(
-                              labelStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                            legend: Legend(
-                              isVisible: true,
-                              position: LegendPosition.bottom,
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                            tooltipBehavior: null,
-                            series: <CartesianSeries>[
-                              ColumnSeries<TahunData, String>(
-                                name: "Tahun",
-                                dataSource: tahun,
-                                color: Colors.amber,
-                                xValueMapper: (TahunData data, _) =>
-                                    data.tahun.toString(),
-                                yValueMapper: (TahunData data, _) =>
-                                    data.jumlah,
-                                dataLabelSettings: DataLabelSettings(
+                          ),
+                          Expanded(
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      child: FutureBuilder(
+                        future: fetchTahun(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            List<TahunData> tahun = snapshot.data!;
+                            return SfCartesianChart(
+                              primaryXAxis: CategoryAxis(
+                                labelStyle: TextStyle(
                                   color: Colors.white,
-                                  isVisible: true,
                                 ),
-                                enableTooltip: true,
-                              )
-                            ],
-                          );
-                        }
-                      },
+                              ),
+                              primaryYAxis: NumericAxis(
+                                labelStyle: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              legend: Legend(
+                                isVisible: true,
+                                position: LegendPosition.bottom,
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              tooltipBehavior: null,
+                              series: <CartesianSeries>[
+                                ColumnSeries<TahunData, String>(
+                                  name: "Tahun",
+                                  dataSource: tahun,
+                                  color: Colors.amber,
+                                  xValueMapper: (TahunData data, _) =>
+                                      data.tahun.toString(),
+                                  yValueMapper: (TahunData data, _) =>
+                                      data.jumlah,
+                                  dataLabelSettings: DataLabelSettings(
+                                    color: Colors.white,
+                                    isVisible: true,
+                                  ),
+                                  enableTooltip: true,
+                                )
+                              ],
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            
+          ],
+        ),
       ),
     );
   }

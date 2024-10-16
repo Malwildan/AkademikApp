@@ -25,7 +25,7 @@ class _SignupState extends State<Signup> {
       if (res != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('User registered successfully'),
+            content: Text('User signup successfully'),
             duration: Duration(seconds: 2),
           ),
         );
@@ -33,7 +33,7 @@ class _SignupState extends State<Signup> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('error : $e'),
+          content: Text('signup error : $e'),
           duration: Duration(seconds: 2),
         ),
       );
