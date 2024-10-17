@@ -15,6 +15,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
   @override
   void initState() {
     super.initState();
+    GetToken();
     _numberController.text = widget.nomor;
   }
 
@@ -23,10 +24,34 @@ class _SendMessagePageState extends State<SendMessagePage> {
 
   // API Configuration
   final String baseUrl = 'https://id.nobox.ai';
-  final String token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWttYWx3aWxsMjZAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZWlkZW50aWZpZXIiOiI5NzIiLCJleHAiOjE3MjU5OTQyOTIsImlzcyI6Imh0dHBzOi8vaWQubm9ib3guYWkvIiwiYXVkIjoiaHR0cHM6Ly9pZC5ub2JveC5haS8ifQ.5QXOVB2pnqNPDXGQXQSZx_ZpXviGSGqp26v7GxxH9Qo'; // Ganti dengan token autentikasi API NoBox
-  final String accountId =
-      '572682472760069'; 
+  final String accountId = '572682472760069';
+  String token = '';
+
+  Future<void> GetToken() async {
+    final url = Uri.parse('https://id.nobox.ai/AccountApi/GenerateToken');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "username": "ultrazyzz28@gmail.com",
+          "password": "Sakkarep28",
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        token = responseData['token'];
+      }
+    } catch (e) {
+      print('Gagal mengirim pesan: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengirim pesan: $e')),
+      );
+    }
+  }
 
   Future<void> sendMessageToAPI(String nomorTujuan, String pesan) async {
     final url = Uri.parse('$baseUrl/Inbox/Send');
@@ -70,7 +95,6 @@ class _SendMessagePageState extends State<SendMessagePage> {
     final String number = _numberController.text;
     final String message = _messageController.text;
 
-    // Validasi jika input kosong
     if (number.isEmpty || message.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Nomor tujuan dan pesan tidak boleh kosong')),
@@ -78,10 +102,8 @@ class _SendMessagePageState extends State<SendMessagePage> {
       return;
     }
 
-    // Panggil API NoBox untuk mengirim pesan
     sendMessageToAPI(number, message);
 
-    // Reset form setelah mengirim pesan
     _messageController.clear();
   }
 
