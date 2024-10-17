@@ -5,9 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   await Supabase.initialize(
-    url: 'ISI URL SUPABASE DISINI',
+    url: 'https://xzhnafvxqpqbdspiwmks.supabase.co/',
     anonKey:
-        'ISI ANON KEY SUPABASE DISINI',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6aG5hZnZ4cXBxYmRzcGl3bWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQzODM1MjAsImV4cCI6MjAzOTk1OTUyMH0.9X7zOtrFlOdyWY43TSG7ISAdzADbbW6773y5jU3NHAc',
   );
 
   runApp(const MyApp());
