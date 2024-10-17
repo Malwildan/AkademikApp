@@ -29,8 +29,26 @@ class _EditSiswaState extends State<EditSiswa> {
   @override
   void initState() {
     super.initState();
-    _fetchCities();
+    _fetchCitiesAndSiswaDetails();
+  }
+
+  void _fetchCitiesAndSiswaDetails() async {
+    await _fetchCities();
+
     _fetchSiswaDetails();
+  }
+
+  Future<void> _fetchCities() async {
+    final response = await supabase.from('kota').select();
+    if (response != null) {
+      setState(() {
+        _cities = List<Map<String, dynamic>>.from(response);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load cities: ${response}')),
+      );
+    }
   }
 
   void _fetchSiswaDetails() async {
@@ -69,11 +87,14 @@ class _EditSiswaState extends State<EditSiswa> {
           SnackBar(content: Text('Isi Semua Data Terlebih Dahulu')));
     } else {
       try {
+        final String formattedDate = _selectedDate != null
+            ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
+            : tanggalLahirController.text;
 
         final response = await supabase.from('siswa').update({
           'Nama': namaController.text,
           'NIS': nisController.text,
-          'TanggalLahir' : tanggalLahirController.text,
+          'TanggalLahir': formattedDate,
           'Alamat': alamatController.text,
           'Nortu': noOrtuController.text,
           'JenisKelamin': _isMale ? 'male' : 'female',
@@ -107,19 +128,6 @@ class _EditSiswaState extends State<EditSiswa> {
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to delete siswa, $e')));
-    }
-  }
-
-  void _fetchCities() async {
-    final response = await supabase.from('kota').select();
-    if (response != null) {
-      setState(() {
-        _cities = List<Map<String, dynamic>>.from(response);
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load cities: ${response}')),
-      );
     }
   }
 

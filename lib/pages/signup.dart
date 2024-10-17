@@ -20,6 +20,9 @@ class _SignupState extends State<Signup> {
       final AuthResponse res = await supabase.auth.signUp(
         email: _emailController.text,
         password: _passwordController.text,
+        data: {
+          'display_name': _namaController.text,
+        },
       );
 
       if (res != null) {
