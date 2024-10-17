@@ -24,7 +24,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
 
   // API Configuration
   final String baseUrl = 'https://id.nobox.ai';
-  final String accountId = '602123638153989';
+  final String accountId = 'ID CHANNEL NOBOX KAMU';
   String token = '';
 
   Future<void> GetToken() async {
@@ -36,8 +36,8 @@ class _SendMessagePageState extends State<SendMessagePage> {
           "Content-Type": "application/json",
         },
         body: jsonEncode({
-          "username": "ultrazyzz28@gmail.com",
-          "password": "Sakkarep28",
+          "username": "EMAIL NOBOX KAMU",
+          "password": "PASSWORD NOBOX KAMU",
         }),
       );
 
