@@ -24,7 +24,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
 
   // API Configuration
   final String baseUrl = 'https://id.nobox.ai';
-  final String accountId = '572682472760069';
+  final String accountId = '602123638153989';
   String token = '';
 
   Future<void> GetToken() async {
