@@ -1,6 +1,6 @@
-# myapp
+# AkademikApp
 
-A new Flutter project.
+Tugas seleksi magang UBIG 2024
 
 ## Getting Started
 
